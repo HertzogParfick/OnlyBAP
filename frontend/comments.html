@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Комментарии</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #000000;">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="index.html" style="color: #D4AF37;">
+                <i class="fas fa-blog me-2"></i>Админ-панель блога
+            </a>
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="articles.html"><i class="fas fa-newspaper me-1"></i>Статьи</a></li>
+                <li class="nav-item"><a class="nav-link active" href="comments.html" style="color: #40E0D0;"><i class="fas fa-comments me-1"></i>Комментарии</a></li>
+                <li class="nav-item"><a class="nav-link" href="content-management.html"><i class="fas fa-tasks me-1"></i>Управление контентом</a></li>
+                <li class="nav-item"><a class="nav-link" href="author-activity.html"><i class="fas fa-chart-bar me-1"></i>Активность авторов</a></li>
+                <li class="nav-item"><a class="nav-link" href="statistics.html"><i class="fas fa-chart-pie me-1"></i>Статистика</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-header" style="background-color: #000000; color: #40E0D0;">
+                <h1 class="card-title mb-0">
+                    <i class="fas fa-comments me-2"></i>Модерация комментариев
+                </h1>
+            </div>
+            <div class="card-body">
+                <div class="mb-4">
+                    <h5 style="color: #000000;">Фильтры:</h5>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="articleFilter" class="form-label fw-bold" style="color: #000000;">Статья:</label>
+                            <select id="articleFilter" class="form-select">
+                                <option value="">Все статьи</option>
+                                <!-- Статьи загружаются динамически -->
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="approvalFilter" class="form-label fw-bold" style="color: #000000;">Статус модерации:</label>
+                            <select id="approvalFilter" class="form-select">
+                                <option value="">Все комментарии</option>
+                                <option value="true">Одобренные</option>
+                                <option value="false">На модерации</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button onclick="applyFilters()" class="btn" style="background-color: #000000; color: #40E0D0; border: 1px solid #40E0D0;">
+                            <i class="fas fa-filter me-1"></i>Применить фильтры
+                        </button>
+                        <button onclick="clearFilters()" class="btn btn-outline-secondary">
+                            <i class="fas fa-times me-1"></i>Сбросить
+                        </button>
+                        <button onclick="location.reload()" class="btn" style="background-color: #000000; color: #D4AF37; border: 1px solid #D4AF37;">
+                            <i class="fas fa-sync-alt me-1"></i>Обновить
+                        </button>
+                    </div>
+                </div>
+
+                <div id="loadingMessage" class="alert alert-info">
+                    <i class="fas fa-spinner fa-spin me-2"></i>Загрузка комментариев...
+                </div>
+                
+                <div id="errorMessage" class="alert alert-danger" style="display: none;"></div>
+                
+                <div id="successContent" style="display: none;">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered table-hover">
+                            <thead style="background-color: #000000; color: #D4AF37;">
+                                <tr>
+                                    <th><i class="fas fa-user me-1"></i>Автор</th>
+                                    <th><i class="fas fa-comment me-1"></i>Комментарий</th>
+                                    <th><i class="fas fa-newspaper me-1"></i>Статья</th>
+                                    <th><i class="fas fa-calendar me-1"></i>Дата</th>
+                                    <th><i class="fas fa-check-circle me-1"></i>Статус</th>
+                                    <th><i class="fas fa-cog me-1"></i>Действия</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dataTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="mt-5 py-3" style="background-color: #000000; color: #D4AF37;">
+        <div class="container text-center">
+             <p class="mb-0">2025 Админ-панель коллективного блога</p>
+        </div>
+    </footer>
+
+    <script>
+        let articles = [];
+        
+        async function loadArticles() {
+            try {
+                const response = await fetch('http://localhost:8000/articles/');
+                articles = await response.json();
+                const select = document.getElementById('articleFilter');
+                select.innerHTML = '<option value="">Все статьи</option>';
+                articles.forEach(article => {
+                    const option = document.createElement('option');
+                    option.value = article._id;
+                    option.textContent = article.title.substring(0, 50) + (article.title.length > 50 ? '...' : '');
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Ошибка загрузки статей:', error);
+            }
+        }
+        
+        async function loadComments() {
+            const loadingElement = document.getElementById('loadingMessage');
+            const errorElement = document.getElementById('errorMessage');
+            const successElement = document.getElementById('successContent');
+            
+            loadingElement.style.display = 'block';
+            errorElement.style.display = 'none';
+            successElement.style.display = 'none';
+            
+            const articleFilter = document.getElementById('articleFilter').value;
+            const approvalFilter = document.getElementById('approvalFilter').value;
+            
+            let url = 'http://localhost:8000/comments/';
+            const params = [];
+            
+            if (articleFilter) params.push(`article_id=${encodeURIComponent(articleFilter)}`);
+            if (approvalFilter !== '') params.push(`is_approved=${approvalFilter}`);
+            
+            if (params.length > 0) {
+                url += '?' + params.join('&');
+            }
+            
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error(`Ошибка: ${response.status}`);
+                
+                const comments = await response.json();
+                
+                loadingElement.style.display = 'none';
+                renderCommentsTable(comments);
+                successElement.style.display = 'block';
+                
+            } catch (error) {
+                loadingElement.style.display = 'none';
+                errorElement.style.display = 'block';
+                errorElement.innerHTML = `<i class="fas fa-exclamation-triangle me-2"></i>Ошибка загрузки: ${error.message}`;
+            }
+        }
+        
+        function renderCommentsTable(comments) {
+            const tableBody = document.getElementById('dataTable');
+            tableBody.innerHTML = '';
+            
+            if (comments.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="text-center text-muted">
+                            <i class="fas fa-info-circle me-2"></i>Комментарии не найдены
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            comments.forEach(comment => {
+                const row = document.createElement('tr');
+                
+                // Статус с цветом
+                let statusClass = 'badge';
+                let statusStyle = '';
+                if (comment.is_approved) {
+                    statusStyle = 'background-color: #40E0D0; color: #000000;';
+                } else {
+                    statusStyle = 'background-color: #DC143C; color: white;';
+                }
+                const statusText = comment.is_approved ? 'Одобрен' : 'На модерации';
+                
+                // Обрезаем длинный текст комментария
+                const commentText = comment.content.length > 100 
+                    ? comment.content.substring(0, 100) + '...' 
+                    : comment.content;
+                
+                row.innerHTML = `
+                    <td>${comment.author_name}</td>
+                    <td>
+                        <div>${commentText}</div>
+                        <small class="text-muted">${comment.content.length > 100 ? '(показан фрагмент)' : ''}</small>
+                    </td>
+                    <td>${comment.article_title || 'Неизвестно'}</td>
+                    <td>${new Date(comment.created_at).toLocaleDateString()}</td>
+                    <td><span class="${statusClass}" style="${statusStyle}">${statusText}</span></td>
+                    <td>
+                        <div class="d-flex flex-wrap gap-1">
+                            ${!comment.is_approved ? `
+                                <button onclick="approveComment('${comment._id}')" class="btn btn-sm" style="background-color: #000000; color: #D4AF37; border: 1px solid #D4AF37;">
+                                    <i class="fas fa-check me-1"></i>Одобрить
+                                </button>
+                            ` : `
+                                <button onclick="unapproveComment('${comment._id}')" class="btn btn-sm" style="background-color: #000000; color: #DC143C; border: 1px solid #DC143C;">
+                                    <i class="fas fa-ban me-1"></i>Вернуть на модерацию
+                                </button>
+                            `}
+                            <button onclick="deleteComment('${comment._id}')" class="btn btn-sm btn-danger">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+        
+        async function approveComment(commentId) {
+            try {
+                const response = await fetch(`http://localhost:8000/comments/${commentId}/approve`, {
+                    method: 'PUT'
+                });
+                
+                if (response.ok) {
+                    alert('Комментарий одобрен!');
+                    loadComments();
+                } else {
+                    alert('Ошибка при одобрении комментария');
+                }
+            } catch (error) {
+                alert('Ошибка: ' + error.message);
+            }
+        }
+        
+        async function unapproveComment(commentId) {
+            if (confirm('Вернуть комментарий на модерацию? Он перестанет быть видимым для пользователей.')) {
+                try {
+                    const response = await fetch(`http://localhost:8000/comments/${commentId}/unapprove`, {
+                        method: 'PUT'
+                    });
+                    
+                    if (response.ok) {
+                        alert('Комментарий возвращен на модерацию!');
+                        loadComments();
+                    } else {
+                        alert('Ошибка при изменении статуса комментария');
+                    }
+                } catch (error) {
+                    alert('Ошибка: ' + error.message);
+                }
+            }
+        }
+        
+        async function deleteComment(commentId) {
+            if (confirm('Удалить этот комментарий?') && commentId) {
+                try {
+                    const response = await fetch(`http://localhost:8000/comments/${commentId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        const result = await response.json();
+                        if (result.deleted_count > 0) {
+                            alert('Комментарий удален!');
+                            loadComments(); // Обновляем список комментариев
+                        } else {
+                            alert('Комментарий не найден');
+                        }
+                    } else {
+                        const error = await response.json();
+                        alert('Ошибка при удалении комментария: ' + (error.error || 'Неизвестная ошибка'));
+                    }
+                } catch (error) {
+                    console.error('Ошибка удаления:', error);
+                    alert('Ошибка сети: ' + error.message);
+                }
+            }
+        }
+        
+        function applyFilters() {
+            loadComments();
+        }
+        
+        function clearFilters() {
+            document.getElementById('articleFilter').value = '';
+            document.getElementById('approvalFilter').value = '';
+            loadComments();
+        }
+        
+        // Загрузка при открытии страницы
+        document.addEventListener('DOMContentLoaded', async function() {
+            await loadArticles();
+            await loadComments();
+        });
+    </script>
+</body>
+</html>

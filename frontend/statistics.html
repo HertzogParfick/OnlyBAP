@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Статистика</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #000000;">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="index.html" style="color: #D4AF37;">
+                <i class="fas fa-blog me-2"></i>Админ-панель блога
+            </a>
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="articles.html"><i class="fas fa-newspaper me-1"></i>Статьи</a></li>
+                <li class="nav-item"><a class="nav-link" href="comments.html"><i class="fas fa-comments me-1"></i>Комментарии</a></li>
+                <li class="nav-item"><a class="nav-link" href="content-management.html"><i class="fas fa-tasks me-1"></i>Управление контентом</a></li>
+                <li class="nav-item"><a class="nav-link" href="author-activity.html"><i class="fas fa-chart-bar me-1"></i>Активность авторов</a></li>
+                <li class="nav-item"><a class="nav-link active" href="statistics.html" style="color: #D4AF37;"><i class="fas fa-chart-pie me-1"></i>Статистика</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-header" style="background-color: #000000; color: white;">
+                <h1 class="card-title mb-0">
+                    <i class="fas fa-chart-pie me-2"></i>Статистика платформы
+                </h1>
+            </div>
+            <div class="card-body">
+                <div id="loadingMessage" class="alert alert-warning">
+                    <i class="fas fa-spinner fa-spin me-2"></i>Загрузка статистических данных...
+                </div>
+                
+                <div id="errorMessage" class="alert alert-danger" style="display: none;"></div>
+                
+                <div id="successContent" style="display: none;">
+                    <!-- Основная статистика -->
+                    <div class="row mb-4">
+                        <div class="col-md-3 mb-3">
+                            <div class="card text-center h-100" style="background-color: #000000; color: white;">
+                                <div class="card-body">
+                                    <i class="fas fa-newspaper fa-3x mb-3" style="color: #D4AF37;"></i>
+                                    <h5 class="card-title">Всего статей</h5>
+                                    <h2 id="totalArticles" class="card-text" style="color: #D4AF37;">0</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card text-center h-100" style="background-color: #000000; color: white;">
+                                <div class="card-body">
+                                    <i class="fas fa-users fa-3x mb-3" style="color: #40E0D0;"></i>
+                                    <h5 class="card-title">Авторов</h5>
+                                    <h2 id="totalAuthors" class="card-text" style="color: #40E0D0;">0</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card text-center h-100" style="background-color: #000000; color: white;">
+                                <div class="card-body">
+                                    <i class="fas fa-comments fa-3x mb-3" style="color: #D4AF37;"></i>
+                                    <h5 class="card-title">Комментариев</h5>
+                                    <h2 id="totalComments" class="card-text" style="color: #D4AF37;">0</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card text-center h-100" style="background-color: #000000; color: white;">
+                                <div class="card-body">
+                                    <i class="fas fa-chart-line fa-3x mb-3" style="color: #40E0D0;"></i>
+                                    <h5 class="card-title">Опубликовано</h5>
+                                    <h2 id="publishedPercent" class="card-text" style="color: #40E0D0;">0%</h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Детальная статистика -->
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <div class="card h-100">
+                                <div class="card-header" style="background-color: #000000; color: #D4AF37;">
+                                    <i class="fas fa-flag me-2"></i>Статусы статей
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between">
+                                            <span>Опубликовано:</span>
+                                            <span id="publishedCount" class="fw-bold">0</span>
+                                        </div>
+                                        <div class="progress mb-2" style="height: 20px;">
+                                            <div id="publishedBar" class="progress-bar" role="progressbar" style="background-color: #D4AF37;"></div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between">
+                                            <span>На модерации:</span>
+                                            <span id="moderationCount" class="fw-bold">0</span>
+                                        </div>
+                                        <div class="progress mb-2" style="height: 20px;">
+                                            <div id="moderationBar" class="progress-bar" role="progressbar" style="background-color: #40E0D0;"></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="d-flex justify-content-between">
+                                            <span>Черновики:</span>
+                                            <span id="draftsCount" class="fw-bold">0</span>
+                                        </div>
+                                        <div class="progress mb-2" style="height: 20px;">
+                                            <div id="draftsBar" class="progress-bar" role="progressbar" style="background-color: #333333;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-4">
+                            <div class="card h-100">
+                                <div class="card-header" style="background-color: #000000; color: #40E0D0;">
+                                    <i class="fas fa-comments me-2"></i>Статус комментариев
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between">
+                                            <span>Одобрено:</span>
+                                            <span id="approvedComments" class="fw-bold">0</span>
+                                        </div>
+                                        <div class="progress mb-2" style="height: 20px;">
+                                            <div id="approvedBar" class="progress-bar" role="progressbar" style="background-color: #D4AF37;"></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="d-flex justify-content-between">
+                                            <span>На модерации:</span>
+                                            <span id="pendingComments" class="fw-bold">0</span>
+                                        </div>
+                                        <div class="progress mb-2" style="height: 20px;">
+                                            <div id="pendingBar" class="progress-bar" role="progressbar" style="background-color: #DC143C;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Распределение по категориям -->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header" style="background-color: #000000; color: white;">
+                                    <i class="fas fa-tags me-2" style="color: #40E0D0;"></i>Распределение статей по категориям
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped table-bordered table-hover">
+                                            <thead style="background-color: #000000; color: #D4AF37;">
+                                                <tr>
+                                                    <th><i class="fas fa-tag me-1"></i>Категория</th>
+                                                    <th><i class="fas fa-newspaper me-1"></i>Количество статей</th>
+                                                    <th><i class="fas fa-chart-bar me-1"></i>Доля</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="categoriesTable"></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="mt-5 py-3" style="background-color: #000000; color: #D4AF37;">
+        <div class="container text-center">
+            <p class="mb-0">2025 Админ-панель коллективного блога</p>
+        </div>
+    </footer>
+
+    <script>
+        async function loadStatistics() {
+            const loadingElement = document.getElementById('loadingMessage');
+            const errorElement = document.getElementById('errorMessage');
+            const successElement = document.getElementById('successContent');
+            
+            loadingElement.style.display = 'block';
+            errorElement.style.display = 'none';
+            successElement.style.display = 'none';
+            
+            try {
+                const response = await fetch('http://localhost:8000/statistics/');
+                if (!response.ok) throw new Error(`Ошибка: ${response.status}`);
+                
+                const data = await response.json();
+                
+                loadingElement.style.display = 'none';
+                renderStatistics(data);
+                successElement.style.display = 'block';
+                
+            } catch (error) {
+                loadingElement.style.display = 'none';
+                errorElement.style.display = 'block';
+                errorElement.innerHTML = `<i class="fas fa-exclamation-triangle me-2"></i>Ошибка загрузки: ${error.message}`;
+            }
+        }
+        
+        function renderStatistics(data) {
+            // Основные показатели
+            document.getElementById('totalArticles').textContent = data.total_articles;
+            document.getElementById('totalAuthors').textContent = data.total_authors;
+            document.getElementById('totalComments').textContent = data.total_comments;
+            document.getElementById('publishedPercent').textContent = data.published_percentage + '%';
+            
+            // Статусы статей
+            document.getElementById('publishedCount').textContent = data.total_published;
+            document.getElementById('moderationCount').textContent = data.total_moderation;
+            document.getElementById('draftsCount').textContent = data.total_drafts;
+            
+            const totalArticles = data.total_articles || 1;
+            document.getElementById('publishedBar').style.width = (data.total_published / totalArticles * 100) + '%';
+            document.getElementById('moderationBar').style.width = (data.total_moderation / totalArticles * 100) + '%';
+            document.getElementById('draftsBar').style.width = (data.total_drafts / totalArticles * 100) + '%';
+            
+            // Статусы комментариев
+            document.getElementById('approvedComments').textContent = data.total_approved_comments;
+            document.getElementById('pendingComments').textContent = data.total_comments - data.total_approved_comments;
+            
+            const totalComments = data.total_comments || 1;
+            document.getElementById('approvedBar').style.width = (data.total_approved_comments / totalComments * 100) + '%';
+            document.getElementById('pendingBar').style.width = ((data.total_comments - data.total_approved_comments) / totalComments * 100) + '%';
+            
+            // Категории
+            const categoriesTable = document.getElementById('categoriesTable');
+            categoriesTable.innerHTML = '';
+            
+            if (!data.categories_distribution || data.categories_distribution.length === 0) {
+                categoriesTable.innerHTML = `
+                    <tr>
+                        <td colspan="3" class="text-center text-muted">
+                            <i class="fas fa-info-circle me-2"></i>Нет данных по категориям
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            // Сортируем по количеству статей (по убыванию)
+            data.categories_distribution.sort((a, b) => b.count - a.count);
+            
+            data.categories_distribution.forEach(category => {
+                const row = document.createElement('tr');
+                const percentage = totalArticles > 0 ? (category.count / totalArticles * 100).toFixed(1) : 0;
+                
+                row.innerHTML = `
+                    <td class="fw-bold">${category._id || 'Без категории'}</td>
+                    <td>
+                        <span class="badge fs-6" style="background-color: #000000; color: #D4AF37;">${category.count}</span>
+                    </td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <div class="progress flex-grow-1 me-2" style="height: 10px;">
+                                <div class="progress-bar" role="progressbar" 
+                                    style="width: ${percentage}%; background-color: #40E0D0;"></div>
+                            </div>
+                            <span>${percentage}%</span>
+                        </div>
+                    </td>
+                `;
+                categoriesTable.appendChild(row);
+            });
+        }
+        
+        // Загрузка данных при открытии страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            loadStatistics();
+        });
+        
+        // Обновление данных каждые 60 секунд
+        setInterval(loadStatistics, 60000);
+    </script>
+</body>
+</html>

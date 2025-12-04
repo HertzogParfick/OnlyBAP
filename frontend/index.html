@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Админ-панель блога</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #000000;">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="index.html" style="color: #D4AF37;">
+                <i class="fas fa-blog me-2"></i>Админ-панель блога
+            </a>
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="articles.html"><i class="fas fa-newspaper me-1"></i>Статьи</a></li>
+                <li class="nav-item"><a class="nav-link" href="comments.html"><i class="fas fa-comments me-1"></i>Комментарии</a></li>
+                <li class="nav-item"><a class="nav-link" href="content-management.html"><i class="fas fa-tasks me-1"></i>Управление контентом</a></li>
+                <li class="nav-item"><a class="nav-link" href="author-activity.html"><i class="fas fa-chart-bar me-1"></i>Активность авторов</a></li>
+                <li class="nav-item"><a class="nav-link" href="statistics.html"><i class="fas fa-chart-pie me-1"></i>Статистика</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-header" style="background-color: #000000; color: #D4AF37;">
+                <h1 class="card-title mb-0">
+                    <i class="fas fa-tachometer-alt me-2"></i>Административная панель блоговой платформы
+                </h1>
+            </div>
+            <div class="card-body">
+                <p class="lead">Система управления контентом коллективного блога. Используйте меню для навигации по разделам.</p>
+                
+                <div class="row mt-4">
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100" style="border: 2px solid #D4AF37;">
+                            <div class="card-body text-center">
+                                <i class="fas fa-newspaper fa-3x mb-3" style="color: #D4AF37;"></i>
+                                <h5 class="card-title">Статьи</h5>
+                                <p class="card-text">Управление статьями с фильтрацией по статусу и автору</p>
+                                <a href="articles.html" class="btn" style="background-color: #000000; color: #D4AF37; border: 1px solid #D4AF37;">Перейти</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100" style="border: 2px solid #40E0D0;">
+                            <div class="card-body text-center">
+                                <i class="fas fa-comments fa-3x mb-3" style="color: #40E0D0;"></i>
+                                <h5 class="card-title">Комментарии</h5>
+                                <p class="card-text">Модерация комментариев с фильтрацией по статьям</p>
+                                <a href="comments.html" class="btn" style="background-color: #000000; color: #40E0D0; border: 1px solid #40E0D0;">Перейти</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mt-2">
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100" style="border: 2px solid #DC143C;">
+                            <div class="card-body text-center">
+                                <i class="fas fa-tasks fa-3x mb-3" style="color: #DC143C;"></i>
+                                <h5 class="card-title">Управление контентом</h5>
+                                <p class="card-text">Сводная таблица: Статьи, Авторы, Категории, Статусы</p>
+                                <a href="content-management.html" class="btn" style="background-color: #000000; color: #DC143C; border: 1px solid #DC143C;">Перейти</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100" style="border: 2px solid #D4AF37;">
+                            <div class="card-body text-center">
+                                <i class="fas fa-chart-bar fa-3x mb-3" style="color: #D4AF37;"></i>
+                                <h5 class="card-title">Активность авторов</h5>
+                                <p class="card-text">Статистика публикаций и комментариев по авторам</p>
+                                <a href="author-activity.html" class="btn" style="background-color: #000000; color: #D4AF37; border: 1px solid #D4AF37;">Перейти</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mt-2">
+                    <div class="col-md-12 mb-3">
+                        <div class="card h-100" style="border: 2px solid #40E0D0;">
+                            <div class="card-body text-center">
+                                <i class="fas fa-chart-pie fa-3x mb-3" style="color: #40E0D0;"></i>
+                                <h5 class="card-title">Общая статистика</h5>
+                                <p class="card-text">Аналитика платформы: статьи, комментарии, категории</p>
+                                <a href="statistics.html" class="btn" style="background-color: #000000; color: #40E0D0; border: 1px solid #40E0D0;">Перейти</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="mt-5 py-3" style="background-color: #000000; color: #D4AF37;">
+        <div class="container text-center">
+             <p class="mb-0">2025 Админ-панель коллективного блога</p>
+        </div>
+    </footer>
+</body>
+</html>

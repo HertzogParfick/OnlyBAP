@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Активность авторов</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #000000;">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="index.html" style="color: #D4AF37;">
+                <i class="fas fa-blog me-2"></i>Админ-панель блога
+            </a>
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="articles.html"><i class="fas fa-newspaper me-1"></i>Статьи</a></li>
+                <li class="nav-item"><a class="nav-link" href="comments.html"><i class="fas fa-comments me-1"></i>Комментарии</a></li>
+                <li class="nav-item"><a class="nav-link" href="content-management.html"><i class="fas fa-tasks me-1"></i>Управление контентом</a></li>
+                <li class="nav-item"><a class="nav-link active" href="author-activity.html" style="color: #D4AF37;"><i class="fas fa-chart-bar me-1"></i>Активность авторов</a></li>
+                <li class="nav-item"><a class="nav-link" href="statistics.html"><i class="fas fa-chart-pie me-1"></i>Статистика</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-header" style="background-color: #000000; color: #D4AF37;">
+                <h1 class="card-title mb-0">
+                    <i class="fas fa-chart-bar me-2"></i>Активность авторов
+                </h1>
+            </div>
+            <div class="card-body">
+                <div class="alert" style="background-color: #000000; color: #40E0D0; border: 1px solid #40E0D0;">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Сводный отчет:</strong> ФИО Автора, Количество опубликованных статей, Общее количество комментариев к его статьям
+                </div>
+
+                <div id="loadingMessage" class="alert alert-warning">
+                    <i class="fas fa-spinner fa-spin me-2"></i>Загрузка данных активности авторов...
+                </div>
+                
+                <div id="errorMessage" class="alert alert-danger" style="display: none;"></div>
+                
+                <div id="successContent" style="display: none;">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered table-hover">
+                            <thead style="background-color: #000000; color: #D4AF37;">
+                                <tr>
+                                    <th><i class="fas fa-user me-1"></i>ФИО автора</th>
+                                    <th><i class="fas fa-envelope me-1"></i>Email</th>
+                                    <th><i class="fas fa-newspaper me-1"></i>Опубликовано статей</th>
+                                    <th><i class="fas fa-comments me-1"></i>Всего комментариев</th>
+                                    <th><i class="fas fa-calendar me-1"></i>Дата регистрации</th>
+                                    <th><i class="fas fa-chart-line me-1"></i>Активность</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dataTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="mt-5 py-3" style="background-color: #000000; color: #D4AF37;">
+        <div class="container text-center">
+            <p class="mb-0">2025 Админ-панель коллективного блога</p>
+        </div>
+    </footer>
+
+    <script>
+        async function loadAuthorActivity() {
+            const loadingElement = document.getElementById('loadingMessage');
+            const errorElement = document.getElementById('errorMessage');
+            const successElement = document.getElementById('successContent');
+            
+            loadingElement.style.display = 'block';
+            errorElement.style.display = 'none';
+            successElement.style.display = 'none';
+            
+            try {
+                const response = await fetch('http://localhost:8000/author-activity/');
+                if (!response.ok) throw new Error(`Ошибка: ${response.status}`);
+                
+                const data = await response.json();
+                
+                loadingElement.style.display = 'none';
+                renderAuthorActivityTable(data);
+                successElement.style.display = 'block';
+                
+            } catch (error) {
+                loadingElement.style.display = 'none';
+                errorElement.style.display = 'block';
+                errorElement.innerHTML = `<i class="fas fa-exclamation-triangle me-2"></i>Ошибка загрузки: ${error.message}`;
+            }
+        }
+        
+        function renderAuthorActivityTable(data) {
+            const tableBody = document.getElementById('dataTable');
+            tableBody.innerHTML = '';
+            
+            if (!data || data.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="text-center text-muted">
+                            <i class="fas fa-info-circle me-2"></i>Данные не найдены
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            // Сортируем по количеству опубликованных статей (по убыванию)
+            data.sort((a, b) => b.published_articles_count - a.published_articles_count);
+            
+            data.forEach(author => {
+                const row = document.createElement('tr');
+                
+                // Определяем уровень активности
+                let activityLevel = '';
+                let activityClass = '';
+                const totalActivity = author.published_articles_count + (author.total_comments_count / 10);
+                
+                if (totalActivity >= 20) {
+                    activityLevel = 'Высокая';
+                    activityClass = 'badge';
+                    activityStyle = 'background-color: #D4AF37; color: #000000;';
+                } else if (totalActivity >= 10) {
+                    activityLevel = 'Средняя';
+                    activityClass = 'badge';
+                    activityStyle = 'background-color: #40E0D0; color: #000000;';
+                } else if (totalActivity >= 5) {
+                    activityLevel = 'Низкая';
+                    activityClass = 'badge';
+                    activityStyle = 'background-color: #DC143C; color: white;';
+                } else {
+                    activityLevel = 'Минимальная';
+                    activityClass = 'badge';
+                    activityStyle = 'background-color: #333333; color: white;';
+                }
+                
+                // Форматирование даты регистрации
+                const regDate = author.registration_date 
+                    ? new Date(author.registration_date).toLocaleDateString() 
+                    : '-';
+                
+                row.innerHTML = `
+                    <td class="fw-bold">${author.author_name}</td>
+                    <td>${author.email || 'Нет email'}</td>
+                    <td>
+                        <span class="badge fs-6" style="background-color: #000000; color: #40E0D0;">
+                            ${author.published_articles_count}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge fs-6" style="background-color: #000000; color: #D4AF37;">
+                            ${author.total_comments_count}
+                        </span>
+                    </td>
+                    <td>${regDate}</td>
+                    <td>
+                        <span class="${activityClass}" style="${activityStyle}">${activityLevel}</span>
+                        <div class="progress mt-1" style="height: 5px;">
+                            <div class="progress-bar" role="progressbar" 
+                                 style="width: ${Math.min(totalActivity * 5, 100)}%; background-color: #DC143C;">
+                            </div>
+                        </div>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+        
+        // Загрузка данных при открытии страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAuthorActivity();
+        });
+        
+        // Обновление данных каждые 60 секунд
+        setInterval(loadAuthorActivity, 60000);
+    </script>
+</body>
+</html>
