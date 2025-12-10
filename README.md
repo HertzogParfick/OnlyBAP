@@ -14,6 +14,7 @@
 - Просмотр статистики публикаций
 ![](https://github.com/HertzogParfick/OnlyBAP/blob/main/frontend.png)
 ### API (Swagger UI)
+![](https://github.com/HertzogParfick/OnlyBAP/blob/main/backend.png)
 Ниже перечислены основные доступные эндпоинты.
 
 #### **Статьи**
