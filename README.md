@@ -45,30 +45,21 @@
 
 ## Сборка и запуск
 
-1. Установите и запустите **MongoDB**.
+1. Установите и запустите **Docker**.
 2. Склонируйте или распакуйте проект в удобную директорию.
 3. Установите необходимые зависимости Python:
    ```bash
    pip install fastapi uvicorn pymongo pydantic
    ```
-4. Запустите MongoDB, если он ещё не запущен.
-5. Для запуска backend откройте консоль и последовательно введите:
+4. Запустите Docker, если он ещё не запущен.
+5. Для развёртывания проекта откройте консоль и последовательно введите:
    ```bash
-   cd <путь к папке, где находиться файл main.py>
-   python main.py
+   cd <путь к папке, где находиться файл docker-compose.yml>
+   docker-compose up --build
 
    Пример:
    cd C:\bap
-   python main.py
-   ```
-6. Для запуска frontend откройте консоль в новом окне (консоль с backend НЕ закрывать!) и последовательно введите:
-   ```bash
-   cd <путь к папке, где находяться файлы фронтенда>
-   python -m http.server 8080
-
-   Пример:
-   cd C:\bap\frontend
-   python -m http.server 8080
+   docker-compose up --build
    ```
 7. Не закрывая консоли, откройте в браузере:
    - Веб-интерфейс: `http://localhost:8080/index.html`
@@ -86,7 +77,11 @@
 
 ## Структура проекта
 ```
-├── main.py             # Backend
+├── docker-compose.yml
+├── backend         # Backend
+│   ├── main.py
+│   ├── Dockerfile
+│   ├── requirements.txt
 ├── frontend/           # Frontend
 │   ├── index.html
 │   ├── articles.html
